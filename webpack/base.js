@@ -7,6 +7,9 @@ module.exports = {
     mode: "development",
     devtool: "eval-source-map",
     entry: "./src/index.js",
+    resolve: {
+        extensions: [".ts", ".tsx", ".js"]
+    },
     output: {
         path: path.resolve("dist"),
         filename: "index_bundle.js"
@@ -24,14 +27,28 @@ module.exports = {
                     loader: "babel-loader"
                 }
             },
-        {
-            test: [/\.vert$/, /\.frag$/],
-            use: "raw-loader"
-        },
-        {
-            test: /\.(gif|png|jpe?g|svg|xml)$/i,
-            use: "file-loader"
-        }
+            {
+                test: [/\.vert$/, /\.frag$/],
+                use: "raw-loader"
+            },
+            {
+                test: /\.(gif|png|jpe?g|svg|xml)$/i,
+                use: "file-loader"
+            },
+            {
+                test: /\.mp3$/,
+                loader: 'file-loader'
+            },
+            {
+                test: /\.(ts|tsx)$/,
+                exclude: /(node_modules|.webpack)/,
+                use: [{
+                    loader: 'ts-loader',
+                    options: {
+                        transpileOnly: true
+                    }
+                }]
+            }
         ]
     },
     plugins: [

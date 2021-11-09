@@ -8,7 +8,8 @@ const presets = [
             modules: false
         }
     ],
-    "@babel/preset-react"
+    "@babel/preset-react",
+    "@babel/preset-typescript"
 ];
 const plugins = [];
 module.exports = { presets, plugins };
