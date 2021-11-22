@@ -14,8 +14,8 @@ import { Star } from '../gameObjects/star/star'
 import { Asteroid } from '../gameObjects/asteroid/asteroid';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
-    active: false,
-    visible: false,
+    active: true,
+    visible: true,
     key: 'GameScene',
     physics: {
         arcade: {
@@ -30,16 +30,16 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 
 export class GameScene extends Phaser.Scene {
 
+    public speed: integer = 100;
+    public score: integer = 0;
+    private distance_to_goal: integer;
+    public collected_stars: integer = 0;
+
     private clouds_small: Phaser.GameObjects.TileSprite;
     private clouds_big: Phaser.GameObjects.TileSprite;
     private rocket: Rocket;
 
     private music: any;
-
-    public speed: integer = 100;
-    public score: integer = 0;
-    private distance_to_goal: integer;
-    public collected_stars: integer = 0;
 
     private speed_timer: integer;
     private spawn_timer: integer;
@@ -101,17 +101,18 @@ export class GameScene extends Phaser.Scene {
 
         //this.music.play();
 
-        this.input.keyboard.on('keydown-SPACE', () => {
-            this.pause();
+        this.input.keyboard.on('keydown-ESC', () => {
+            this.scene.pause('GameScene');
+            this.scene.launch('MainMenuScene', { is_paused: true });
         }, this);
 
         this.events.on('pause', () => {
+            this.music.pause();
             console.log('Game paused');
         })
 
         this.events.on('resume', () => {
             this.music.resume();
-            this.scene.stop('PauseScene');
             console.log('Game resumed');
         })
 
@@ -123,63 +124,87 @@ export class GameScene extends Phaser.Scene {
         this.speed = 100;
         this.speed_timer = 0;
         this.spawn_timer = 0;
+
+        //this.music.pause();
+        this.scene.pause('GameScene');
     }
 
     update(time, delta): void {
 
-        this.speed_timer += delta;
+            this.speed_timer += delta;
 
-        if (this.speed_timer > 1000 /*ms*/) {
-            this.score += 1;
-            this.speed += 1;
-            this.speed_timer -= 1000;
-        }
-
-        this.clouds_small.tilePositionY -= 0.15 * delta * (this.speed / 100);
-        this.clouds_big.tilePositionY -= 0.2 * delta * (this.speed / 100);
-
-        this.rocket.update();
-
-        this.spawn_timer += delta * (this.speed / 100);
-
-        if (this.spawn_timer > 1000) {
-
-            var star = new Star(this);
-            this.stars.push(star);
-
-            var asteroid = new Asteroid(this);
-            this.asteroids.push(asteroid);
-
-            this.spawn_timer -= 1000;
-        }
-
-        this.stars.forEach((child: any) => {
-            child.y += 0.3 * delta * (this.speed / 100);
-        });
-
-        this.stars.forEach((star: Phaser.GameObjects.Sprite) => {
-            if (star.y > 900) {
-                this.destroyStar(star);
+            if (this.speed_timer > 1000 /*ms*/) {
+                this.score += 1;
+                this.speed += 1;
+                this.speed_timer -= 1000;
             }
-        });
- 
-        this.asteroids.forEach((child: any) => {
-            child.y += 0.25 * delta * (this.speed / 100);
-        });
 
-        this.asteroids.forEach((child: Phaser.GameObjects.Sprite) => {
-            if (child.y > 900) {
-                this.asteroids.splice(this.asteroids.indexOf(child), 1);
-                this.matter.world.remove(child);
-                child.destroy();
+            this.clouds_small.tilePositionY -= 0.15 * delta * (this.speed / 100);
+            this.clouds_big.tilePositionY -= 0.2 * delta * (this.speed / 100);
+
+            this.rocket.update();
+
+            this.spawn_timer += delta * (this.speed / 100);
+
+            if (this.spawn_timer > 1000) {
+
+                var star = new Star(this);
+                this.stars.push(star);
+
+                var asteroid = new Asteroid(this);
+                this.asteroids.push(asteroid);
+
+                this.spawn_timer -= 1000;
             }
-        });
+
+            this.stars.forEach((child: any) => {
+                child.y += 0.3 * delta * (this.speed / 100);
+            });
+
+            this.stars.forEach((star: Phaser.GameObjects.Sprite) => {
+                if (star.y > 900) {
+                    this.destroyStar(star);
+                }
+            });
+
+            this.asteroids.forEach((child: any) => {
+                child.y += 0.25 * delta * (this.speed / 100);
+            });
+
+            this.asteroids.forEach((child: Phaser.GameObjects.Sprite) => {
+                if (child.y > 900) {
+                    this.asteroids.splice(this.asteroids.indexOf(child), 1);
+                    this.matter.world.remove(child);
+                    child.destroy();
+                }
+            });
     }
 
-    pause() {
-        this.music.pause();
-        this.scene.pause('GameScene');
-        this.scene.launch('PauseScene');
+    reset(): void {
+
+        this.score = 0;
+        this.collected_stars = 0;
+        this.speed = 100;
+        this.speed_timer = 0;
+        this.spawn_timer = 0;
+
+        this.stars.forEach((child: any) => {
+            this.stars.splice(this.stars.indexOf(child), 0);
+            this.matter.world.remove(child);
+            child.destroy();
+        });
+
+        this.asteroids.forEach((child: any) => {
+            this.asteroids.splice(this.asteroids.indexOf(child), 0);
+            this.matter.world.remove(child);
+            child.destroy();
+        });
+
+        this.stars = [];
+        this.asteroids = [];
+
+        this.rocket.x = this.cameras.main.centerX;
+        this.rocket.y = this.cameras.main.height - 100;
     }
 
     collectStar(star): void {

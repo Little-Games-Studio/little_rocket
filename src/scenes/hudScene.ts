@@ -29,7 +29,6 @@ export class HUDScene extends Phaser.Scene {
 
         //  Grab a reference to the Game Scene
         this.myGame = this.scene.get('GameScene') as GameScene;
-        console.log(this.myGame.score)
     }
 
     update(): void {
