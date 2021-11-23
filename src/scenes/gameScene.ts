@@ -30,14 +30,14 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 
 export class GameScene extends Phaser.Scene {
 
+    public rocket: Rocket;
     public speed: integer = 100;
     public score: integer = 0;
-    private distance_to_goal: integer;
+    public distance_to_goal: integer;
     public collected_stars: integer = 0;
 
     private clouds_small: Phaser.GameObjects.TileSprite;
     private clouds_big: Phaser.GameObjects.TileSprite;
-    private rocket: Rocket;
 
     private music: any;
 

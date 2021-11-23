@@ -19,6 +19,9 @@ const shape: Phaser.Types.Math.Vector2Like[] = [
 
 export class Rocket extends Phaser.Physics.Matter.Sprite {
 
+    public move_left: boolean = false;
+    public move_right: boolean = false;
+
     private keyW: Phaser.Input.Keyboard.Key;
     private keyA: Phaser.Input.Keyboard.Key;
     private keyS: Phaser.Input.Keyboard.Key;
@@ -45,13 +48,15 @@ export class Rocket extends Phaser.Physics.Matter.Sprite {
 
         this.setVelocity(0, 0);
 
+        console.log(this.move_left)
+
         /* if (this.keyW?.isDown || this.cursors.up.isDown) {
             if (this.y > this.height / 2) { // rocket cannot fly lower than the bottom of the screen
                 this.setVelocityY(-1);
             }  
         } */
 
-        if (this.keyA?.isDown || this.cursors.left.isDown) {
+        if (this.keyA?.isDown || this.cursors.left.isDown || this.move_left) {
             if (this.x > this.width / 2) { // rocket cannot leave screen on the left
                 this.setVelocityX(-1);
             }
@@ -63,7 +68,7 @@ export class Rocket extends Phaser.Physics.Matter.Sprite {
             }
         } */
 
-        if (this.keyD?.isDown || this.cursors.right.isDown) {
+        if (this.keyD?.isDown || this.cursors.right.isDown || this.move_right) {
             if (this.x < this.scene.cameras.main.width - this.width / 2) {  // rocket cannot leave screen on the right
                 this.setVelocityX(1);
             }
